@@ -176,7 +176,16 @@ public class ViewTest : AndroidTestCase() {
     assertEquals(10 * density, example.n)
   }
 
-  private fun viewWithId(id: Int) : View {
+  public fun testString() {
+    class Example(context: Context) : FrameLayout(context) {
+      val str : String by bindString(R.string.testString)
+    }
+
+    var example = Example(context)
+    assertEquals("KotterKnife", example.str)
+  }
+
+    private fun viewWithId(id: Int) : View {
     val view = View(context)
     view.id = id
     return view

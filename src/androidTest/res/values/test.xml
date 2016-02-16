@@ -3,4 +3,5 @@
 	<color name="testColor">#0000beef</color>
 	<integer name="testInt">123456</integer>
 	<dimen name="testDimen">10dp</dimen>
+	<string name="testString">KotterKnife</string>
 </resources>
