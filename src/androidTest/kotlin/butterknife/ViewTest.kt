@@ -8,6 +8,7 @@ import android.view.View
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertEquals
+import butterknife.test.R
 
 public class ViewTest : AndroidTestCase() {
   public fun testCast() {
@@ -142,6 +143,15 @@ public class ViewTest : AndroidTestCase() {
     example.removeAllViews()
     assertNotNull(example.name)
     assertEquals(2, example.name.count())
+  }
+
+  public fun testColor() {
+    class Example(context: Context) : FrameLayout(context) {
+      val color : Int by bindColor(R.color.testColor)
+    }
+
+    var example = Example(context)
+    assertEquals(0x0000beef, example.color)
   }
 
   private fun viewWithId(id: Int) : View {

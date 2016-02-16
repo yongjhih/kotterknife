@@ -3,6 +3,8 @@ package butterknife
 import android.app.Activity
 import android.app.Dialog
 import android.app.Fragment
+import android.content.Context
+import android.content.res.Resources
 import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.View
 import kotlin.properties.ReadOnlyProperty
@@ -61,6 +63,19 @@ public fun <V : View> SupportFragment.bindOptionalViews(vararg ids: Int)
 public fun <V : View> ViewHolder.bindOptionalViews(vararg ids: Int)
     : ReadOnlyProperty<ViewHolder, List<V>> = optional(ids, viewFinder)
 
+public fun View.bindColor(id: Int)
+    : ReadOnlyProperty<View, Int> = requiredColor(context, id, colorFinder)
+public fun Activity.bindColor(id: Int)
+    : ReadOnlyProperty<Activity, Int> = requiredColor(this, id, colorFinder)
+public fun Dialog.bindColor(id: Int)
+    : ReadOnlyProperty<Dialog, Int> = requiredColor(context, id, colorFinder)
+public fun Fragment.bindColor(id: Int)
+    : ReadOnlyProperty<Fragment, Int> = requiredColor(context, id, colorFinder)
+public fun SupportFragment.bindColor(id: Int)
+    : ReadOnlyProperty<SupportFragment, Int> = requiredColor(context, id, colorFinder)
+public fun ViewHolder.bindColor(id: Int)
+    : ReadOnlyProperty<ViewHolder, Int> = requiredColor(itemView.context, id, colorFinder)
+
 private val View.viewFinder: View.(Int) -> View?
     get() = { findViewById(it) }
 private val Activity.viewFinder: Activity.(Int) -> View?
@@ -74,8 +89,23 @@ private val SupportFragment.viewFinder: SupportFragment.(Int) -> View?
 private val ViewHolder.viewFinder: ViewHolder.(Int) -> View?
     get() = { itemView.findViewById(it) }
 
+private val View.colorFinder: Context.(Int) -> Int?
+    get() = { resources.getColor(it, theme) }
+private val Activity.colorFinder: Context.(Int) -> Int?
+    get() = { resources.getColor(it, theme) }
+private val Dialog.colorFinder: Context.(Int) -> Int?
+    get() = { resources.getColor(it, theme) }
+private val Fragment.colorFinder: Context.(Int) -> Int?
+    get() = { resources.getColor(it, theme) }
+private val SupportFragment.colorFinder: Context.(Int) -> Int?
+    get() = { resources.getColor(it) }
+private val ViewHolder.colorFinder: Context.(Int) -> Int?
+    get() = { itemView.context.resources.getColor(it) }
+
 private fun viewNotFound(id:Int, desc: KProperty<*>): Nothing =
     throw IllegalStateException("View ID $id for '${desc.name}' not found.")
+private fun colorNotFound(id:Int, desc: KProperty<*>): Nothing =
+        throw IllegalStateException("Color ID $id for '${desc.name}' not found.")
 
 @Suppress("UNCHECKED_CAST")
 private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?)
@@ -92,6 +122,9 @@ private fun <T, V : View> required(ids: IntArray, finder: T.(Int) -> View?)
 @Suppress("UNCHECKED_CAST")
 private fun <T, V : View> optional(ids: IntArray, finder: T.(Int) -> View?)
     = Lazy { t: T, desc -> ids.map { t.finder(it) as V? }.filterNotNull() }
+
+private fun <T> requiredColor(context: Context, id: Int, finder: (Context, Int) -> Int?)
+    = Lazy { t: T, desc -> finder(context, id) ?: colorNotFound(id, desc) }
 
 // Like Kotlin's lazy delegate but the initializer gets the target and metadata passed to it
 private class Lazy<T, V>(private val initializer: (T, KProperty<*>) -> V) : ReadOnlyProperty<T, V> {
