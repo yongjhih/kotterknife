@@ -185,7 +185,16 @@ public class ViewTest : AndroidTestCase() {
     assertEquals("KotterKnife", example.str)
   }
 
-    private fun viewWithId(id: Int) : View {
+  public fun testBool() {
+    class Example(context: Context) : FrameLayout(context) {
+      val b : Boolean by bindBool(R.bool.testBool)
+    }
+
+    var example = Example(context)
+    assertEquals(true, example.b)
+  }
+
+  private fun viewWithId(id: Int) : View {
     val view = View(context)
     view.id = id
     return view

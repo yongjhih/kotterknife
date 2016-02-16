@@ -4,4 +4,5 @@
 	<integer name="testInt">123456</integer>
 	<dimen name="testDimen">10dp</dimen>
 	<string name="testString">KotterKnife</string>
+	<bool name="testBool">true</bool>
 </resources>

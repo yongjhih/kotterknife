@@ -115,6 +115,19 @@ public fun SupportFragment.bindString(id: Int)
 public fun ViewHolder.bindString(id: Int)
         : ReadOnlyProperty<ViewHolder, String> = requiredString(itemView.context, id, stringFinder)
 
+public fun View.bindBool(id: Int)
+        : ReadOnlyProperty<View, Boolean> = requiredBool(context, id, boolFinder)
+public fun Activity.bindBool(id: Int)
+        : ReadOnlyProperty<Activity, Boolean> = requiredBool(this, id, boolFinder)
+public fun Dialog.bindBool(id: Int)
+        : ReadOnlyProperty<Dialog, Boolean> = requiredBool(context, id, boolFinder)
+public fun Fragment.bindBool(id: Int)
+        : ReadOnlyProperty<Fragment, Boolean> = requiredBool(context, id, boolFinder)
+public fun SupportFragment.bindBool(id: Int)
+        : ReadOnlyProperty<SupportFragment, Boolean> = requiredBool(context, id, boolFinder)
+public fun ViewHolder.bindBool(id: Int)
+        : ReadOnlyProperty<ViewHolder, Boolean> = requiredBool(itemView.context, id, boolFinder)
+
 private val View.viewFinder: View.(Int) -> View?
     get() = { findViewById(it) }
 private val Activity.viewFinder: Activity.(Int) -> View?
@@ -180,6 +193,19 @@ private val SupportFragment.stringFinder: Context.(Int) -> String?
 private val ViewHolder.stringFinder: Context.(Int) -> String?
     get() = { itemView.context.resources.getString(it) }
 
+private val View.boolFinder: Context.(Int) -> Boolean?
+    get() = { resources.getBoolean(it) }
+private val Activity.boolFinder: Context.(Int) -> Boolean?
+    get() = { resources.getBoolean(it) }
+private val Dialog.boolFinder: Context.(Int) -> Boolean?
+    get() = { resources.getBoolean(it) }
+private val Fragment.boolFinder: Context.(Int) -> Boolean?
+    get() = { resources.getBoolean(it) }
+private val SupportFragment.boolFinder: Context.(Int) -> Boolean?
+    get() = { resources.getBoolean(it) }
+private val ViewHolder.boolFinder: Context.(Int) -> Boolean?
+    get() = { itemView.context.resources.getBoolean(it) }
+
 private fun viewNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("View", id, desc)
 private fun colorNotFound(id:Int, desc: KProperty<*>): Nothing =
@@ -190,6 +216,8 @@ private fun dimenNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("Dimen", id, desc)
 private fun stringNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("String", id, desc)
+private fun boolNotFound(id:Int, desc: KProperty<*>): Nothing =
+    notFound("Boolean", id, desc)
 private fun notFound(type:String, id:Int, desc: KProperty<*>): Nothing =
     throw IllegalStateException("$type ID $id for '${desc.name}' not found.")
 
@@ -220,6 +248,9 @@ private fun <T> requiredDimen(context: Context, id: Int, finder: (Context, Int) 
 
 private fun <T> requiredString(context: Context, id: Int, finder: (Context, Int) -> String?)
     = Lazy { t: T, desc -> finder(context, id) ?: stringNotFound(id, desc) }
+
+private fun <T> requiredBool(context: Context, id: Int, finder: (Context, Int) -> Boolean?)
+    = Lazy { t: T, desc -> finder(context, id) ?: boolNotFound(id, desc) }
 
 // Like Kotlin's lazy delegate but the initializer gets the target and metadata passed to it
 private class Lazy<T, V>(private val initializer: (T, KProperty<*>) -> V) : ReadOnlyProperty<T, V> {
