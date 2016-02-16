@@ -89,6 +89,19 @@ public fun SupportFragment.bindInt(id: Int)
 public fun ViewHolder.bindInt(id: Int)
         : ReadOnlyProperty<ViewHolder, Int> = requiredInt(itemView.context, id, intFinder)
 
+public fun View.bindDimen(id: Int)
+        : ReadOnlyProperty<View, Float> = requiredDimen(context, id, dimenFinder)
+public fun Activity.bindDimen(id: Int)
+        : ReadOnlyProperty<Activity, Float> = requiredDimen(this, id, dimenFinder)
+public fun Dialog.bindDimen(id: Int)
+        : ReadOnlyProperty<Dialog, Float> = requiredDimen(context, id, dimenFinder)
+public fun Fragment.bindDimen(id: Int)
+        : ReadOnlyProperty<Fragment, Float> = requiredDimen(context, id, dimenFinder)
+public fun SupportFragment.bindDimen(id: Int)
+        : ReadOnlyProperty<SupportFragment, Float> = requiredDimen(context, id, dimenFinder)
+public fun ViewHolder.bindDimen(id: Int)
+        : ReadOnlyProperty<ViewHolder, Float> = requiredDimen(itemView.context, id, dimenFinder)
+
 private val View.viewFinder: View.(Int) -> View?
     get() = { findViewById(it) }
 private val Activity.viewFinder: Activity.(Int) -> View?
@@ -128,12 +141,27 @@ private val SupportFragment.intFinder: Context.(Int) -> Int?
 private val ViewHolder.intFinder: Context.(Int) -> Int?
     get() = { itemView.context.resources.getInteger(it) }
 
+private val View.dimenFinder: Context.(Int) -> Float?
+    get() = { resources.getDimension(it) }
+private val Activity.dimenFinder: Context.(Int) -> Float?
+    get() = { resources.getDimension(it) }
+private val Dialog.dimenFinder: Context.(Int) -> Float?
+    get() = { resources.getDimension(it) }
+private val Fragment.dimenFinder: Context.(Int) -> Float?
+    get() = { resources.getDimension(it) }
+private val SupportFragment.dimenFinder: Context.(Int) -> Float?
+    get() = { resources.getDimension(it) }
+private val ViewHolder.dimenFinder: Context.(Int) -> Float?
+    get() = { itemView.context.resources.getDimension(it) }
+
 private fun viewNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("View", id, desc)
 private fun colorNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("Color", id, desc)
 private fun intNotFound(id:Int, desc: KProperty<*>): Nothing =
     notFound("Integer", id, desc)
+private fun dimenNotFound(id:Int, desc: KProperty<*>): Nothing =
+    notFound("Dimen", id, desc)
 private fun notFound(type:String, id:Int, desc: KProperty<*>): Nothing =
     throw IllegalStateException("$type ID $id for '${desc.name}' not found.")
 
@@ -157,7 +185,10 @@ private fun <T> requiredColor(context: Context, id: Int, finder: (Context, Int) 
     = Lazy { t: T, desc -> finder(context, id) ?: colorNotFound(id, desc) }
 
 private fun <T> requiredInt(context: Context, id: Int, finder: (Context, Int) -> Int?)
-        = Lazy { t: T, desc -> finder(context, id) ?: intNotFound(id, desc) }
+    = Lazy { t: T, desc -> finder(context, id) ?: intNotFound(id, desc) }
+
+private fun <T> requiredDimen(context: Context, id: Int, finder: (Context, Int) -> Float?)
+    = Lazy { t: T, desc -> finder(context, id) ?: dimenNotFound(id, desc) }
 
 // Like Kotlin's lazy delegate but the initializer gets the target and metadata passed to it
 private class Lazy<T, V>(private val initializer: (T, KProperty<*>) -> V) : ReadOnlyProperty<T, V> {

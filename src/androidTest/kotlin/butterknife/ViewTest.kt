@@ -163,6 +163,19 @@ public class ViewTest : AndroidTestCase() {
     assertEquals(123456, example.n)
   }
 
+  public fun testDimen() {
+    class Example(context: Context) : FrameLayout(context) {
+      val n : Float by bindDimen(R.dimen.testDimen)
+    }
+
+    // tests run on android devices, so we need the device density to ensure that the value is
+    // correctly read from resources
+    var density = context.resources.displayMetrics.density
+
+    var example = Example(context)
+    assertEquals(10 * density, example.n)
+  }
+
   private fun viewWithId(id: Int) : View {
     val view = View(context)
     view.id = id
