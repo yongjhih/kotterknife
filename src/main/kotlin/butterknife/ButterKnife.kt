@@ -76,6 +76,19 @@ public fun SupportFragment.bindColor(id: Int)
 public fun ViewHolder.bindColor(id: Int)
     : ReadOnlyProperty<ViewHolder, Int> = requiredColor(itemView.context, id, colorFinder)
 
+public fun View.bindInt(id: Int)
+        : ReadOnlyProperty<View, Int> = requiredInt(context, id, intFinder)
+public fun Activity.bindInt(id: Int)
+        : ReadOnlyProperty<Activity, Int> = requiredInt(this, id, intFinder)
+public fun Dialog.bindInt(id: Int)
+        : ReadOnlyProperty<Dialog, Int> = requiredInt(context, id, intFinder)
+public fun Fragment.bindInt(id: Int)
+        : ReadOnlyProperty<Fragment, Int> = requiredInt(context, id, intFinder)
+public fun SupportFragment.bindInt(id: Int)
+        : ReadOnlyProperty<SupportFragment, Int> = requiredInt(context, id, intFinder)
+public fun ViewHolder.bindInt(id: Int)
+        : ReadOnlyProperty<ViewHolder, Int> = requiredInt(itemView.context, id, intFinder)
+
 private val View.viewFinder: View.(Int) -> View?
     get() = { findViewById(it) }
 private val Activity.viewFinder: Activity.(Int) -> View?
@@ -102,10 +115,27 @@ private val SupportFragment.colorFinder: Context.(Int) -> Int?
 private val ViewHolder.colorFinder: Context.(Int) -> Int?
     get() = { itemView.context.resources.getColor(it) }
 
+private val View.intFinder: Context.(Int) -> Int?
+    get() = { resources.getInteger(it) }
+private val Activity.intFinder: Context.(Int) -> Int?
+    get() = { resources.getInteger(it) }
+private val Dialog.intFinder: Context.(Int) -> Int?
+    get() = { resources.getInteger(it) }
+private val Fragment.intFinder: Context.(Int) -> Int?
+    get() = { resources.getInteger(it) }
+private val SupportFragment.intFinder: Context.(Int) -> Int?
+    get() = { resources.getInteger(it) }
+private val ViewHolder.intFinder: Context.(Int) -> Int?
+    get() = { itemView.context.resources.getInteger(it) }
+
 private fun viewNotFound(id:Int, desc: KProperty<*>): Nothing =
-    throw IllegalStateException("View ID $id for '${desc.name}' not found.")
+    notFound("View", id, desc)
 private fun colorNotFound(id:Int, desc: KProperty<*>): Nothing =
-        throw IllegalStateException("Color ID $id for '${desc.name}' not found.")
+    notFound("Color", id, desc)
+private fun intNotFound(id:Int, desc: KProperty<*>): Nothing =
+    notFound("Integer", id, desc)
+private fun notFound(type:String, id:Int, desc: KProperty<*>): Nothing =
+    throw IllegalStateException("$type ID $id for '${desc.name}' not found.")
 
 @Suppress("UNCHECKED_CAST")
 private fun <T, V : View> required(id: Int, finder: T.(Int) -> View?)
@@ -125,6 +155,9 @@ private fun <T, V : View> optional(ids: IntArray, finder: T.(Int) -> View?)
 
 private fun <T> requiredColor(context: Context, id: Int, finder: (Context, Int) -> Int?)
     = Lazy { t: T, desc -> finder(context, id) ?: colorNotFound(id, desc) }
+
+private fun <T> requiredInt(context: Context, id: Int, finder: (Context, Int) -> Int?)
+        = Lazy { t: T, desc -> finder(context, id) ?: intNotFound(id, desc) }
 
 // Like Kotlin's lazy delegate but the initializer gets the target and metadata passed to it
 private class Lazy<T, V>(private val initializer: (T, KProperty<*>) -> V) : ReadOnlyProperty<T, V> {

@@ -154,6 +154,15 @@ public class ViewTest : AndroidTestCase() {
     assertEquals(0x0000beef, example.color)
   }
 
+  public fun testInt() {
+    class Example(context: Context) : FrameLayout(context) {
+      val n : Int by bindInt(R.integer.testInt)
+    }
+
+    var example = Example(context)
+    assertEquals(123456, example.n)
+  }
+
   private fun viewWithId(id: Int) : View {
     val view = View(context)
     view.id = id
